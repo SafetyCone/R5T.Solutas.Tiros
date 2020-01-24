@@ -1,0 +1,2 @@
+# R5T.Solutas.Tiros
+A Tiros-based IVisualStudioSolutionFileSerializer service implementation for the Solutas project.
