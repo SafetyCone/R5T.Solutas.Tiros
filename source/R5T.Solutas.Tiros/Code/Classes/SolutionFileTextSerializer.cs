@@ -43,10 +43,12 @@ namespace R5T.Solutas.Tiros
             var globalSectionsInOrder = new List<ISolutionFileGlobalSection>();
 
             // SolutionConfigurationPlatforms.
-            var solutionConfigurationPlatforms = globalSections.GetSolutionConfigurationPlatformsGlobalSection(); // Must have.
-
-            globalSectionsInOrder.Add(solutionConfigurationPlatforms);
-            globalSections.Remove(solutionConfigurationPlatforms);
+            var hasSolutionConfigurationPlatforms = globalSections.HasSolutionConfigurationPlatformsGlobalSection(out var solutionConfigurationPlatforms);
+            if(hasSolutionConfigurationPlatforms)
+            {
+                globalSectionsInOrder.Add(solutionConfigurationPlatforms);
+                globalSections.Remove(solutionConfigurationPlatforms);
+            }
 
             // ProjectConfigurationPlatforms.
             var hasProjectConfigurationPlatforms = globalSections.HasProjectConfigurationPlatformsGlobalSection(out var projectConfigurationPlatforms); // Can have.
@@ -57,7 +59,7 @@ namespace R5T.Solutas.Tiros
             }
 
             // Solution properties.
-            var solutionProperties = globalSections.GetGlobalSectionByName<GenericSolutionFileGlobalSection>(Constants.SolutionPropertiesSolutionGlobalSectionName); // Must have.
+            var solutionProperties = globalSections.GetGlobalSectionByName<SolutionPropertiesGlobalSection>(Constants.SolutionPropertiesSolutionGlobalSectionName); // Must have.
 
             globalSectionsInOrder.Add(solutionProperties);
             globalSections.Remove(solutionProperties);
@@ -134,11 +136,31 @@ namespace R5T.Solutas.Tiros
                     lines = SolutionFileTextSerializer.SerializeSolutionConfigurationPlatformsGlobalSection(solutionConfigurationPlatformsGlobalSection);
                     break;
 
+                case ExtensibilityGlobalsGlobalSection extensibilityGlobalsGlobalSection:
+                    lines = SolutionFileTextSerializer.SerializeExtensibilityGlobalsGlobalSection(extensibilityGlobalsGlobalSection);
+                    break;
+
+                case SolutionPropertiesGlobalSection solutionPropertiesGlobalSection:
+                    lines = SolutionFileTextSerializer.SerializeSolutionPropertiesGlobalSection(solutionPropertiesGlobalSection);
+                    break;
+
                 default:
                     throw new Exception($"Unserializable global section: {globalSection.Name} (Type: {globalSection.GetType()}).");
             }
 
             return lines;
+        }
+
+        private static IEnumerable<string> SerializeSolutionPropertiesGlobalSection(SolutionPropertiesGlobalSection solutionPropertiesGlobalSection)
+        {
+            var hideSolutionNode = $"HideSolutionNode = {solutionPropertiesGlobalSection.HideSolutionNode.ToStringSolutionFileFormat()}";
+            yield return hideSolutionNode;
+        }
+
+        private static IEnumerable<string> SerializeExtensibilityGlobalsGlobalSection(ExtensibilityGlobalsGlobalSection extensibilityGlobalsGlobalSection)
+        {
+            var solutionGuid = $"SolutionGuid = {extensibilityGlobalsGlobalSection.SolutionGuid.ToStringSolutionFileFormat()}";
+            yield return solutionGuid;
         }
 
         private static IEnumerable<string> SerializeSolutionConfigurationPlatformsGlobalSection(SolutionConfigurationPlatformsGlobalSection solutionConfigurationPlatformsGlobalSection)
