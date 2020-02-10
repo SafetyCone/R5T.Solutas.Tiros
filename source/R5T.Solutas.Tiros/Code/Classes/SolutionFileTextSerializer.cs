@@ -59,7 +59,7 @@ namespace R5T.Solutas.Tiros
             }
 
             // Solution properties.
-            var solutionProperties = globalSections.GetGlobalSectionByName<SolutionPropertiesGlobalSection>(Constants.SolutionPropertiesSolutionGlobalSectionName); // Must have.
+            var solutionProperties = globalSections.GetSolutionPropertiesGlobalSection(); // Must have.
 
             globalSectionsInOrder.Add(solutionProperties);
             globalSections.Remove(solutionProperties);
@@ -73,7 +73,7 @@ namespace R5T.Solutas.Tiros
             }
 
             // Extensibility globals.
-            var hasExtensibilityGlobals = globalSections.HasGlobalSectionByName<GenericSolutionFileGlobalSection>(Constants.ExtensibilityGlobalsSolutionGlobalSectionName, out var extensibilityGlobals); // Can have.
+            var hasExtensibilityGlobals = globalSections.HasGlobalSectionByName<GenericSolutionFileGlobalSection>(ExtensibilityGlobalsGlobalSection.GlobalSectionName, out var extensibilityGlobals); // Can have.
             if (hasExtensibilityGlobals)
             {
                 globalSectionsInOrder.Add(extensibilityGlobals);
@@ -124,7 +124,7 @@ namespace R5T.Solutas.Tiros
                     lines = SolutionFileTextSerializer.SerializeGenericGlobalSection(genericGlobalSection);
                     break;
 
-                case NestedProjectsSolutionFileGlobalSection nestedGlobalSection:
+                case NestedProjectsGlobalSection nestedGlobalSection:
                     lines = SolutionFileTextSerializer.SerializeNestedProjectsGlobalSection(nestedGlobalSection);
                     break;
 
@@ -181,7 +181,7 @@ namespace R5T.Solutas.Tiros
             }
         }
 
-        private static IEnumerable<string> SerializeNestedProjectsGlobalSection(NestedProjectsSolutionFileGlobalSection nestedProjectsGlobalSection)
+        private static IEnumerable<string> SerializeNestedProjectsGlobalSection(NestedProjectsGlobalSection nestedProjectsGlobalSection)
         {
             foreach (var projectNesting in nestedProjectsGlobalSection.ProjectNestings)
             {
@@ -240,16 +240,24 @@ namespace R5T.Solutas.Tiros
             ISolutionFileGlobalSection globalSection;
             switch (sectionName)
             {
-                case Constants.SolutionConfigurationPlatformsGlobalSectionName:
+                case SolutionConfigurationPlatformsGlobalSection.GlobalSectionName:
                     globalSection = SolutionFileTextSerializer.DeserializeSolutionConfigurationPlatformsGlobalSection(reader, ref currentLine, preOrPostSolution);
                     break;
 
-                case Constants.ProjectConfigurationPlatformsGlobalSectionName:
+                case ProjectConfigurationPlatformsGlobalSection.GlobalSectionName:
                     globalSection = SolutionFileTextSerializer.DeserializeProjectConfigurationPlatformsGlobalSection(reader, ref currentLine, preOrPostSolution);
                     break;
 
-                case Constants.NestedProjectsGlobalSectionName:
+                case NestedProjectsGlobalSection.GlobalSectionName:
                     globalSection = SolutionFileTextSerializer.DeserializeNestedProjectsGlobalSection(reader, ref currentLine, preOrPostSolution);
+                    break;
+
+                case SolutionPropertiesGlobalSection.GlobalSectionName:
+                    globalSection = SolutionFileTextSerializer.DeserializeSolutionPropertiesGlobalSection(reader, ref currentLine, preOrPostSolution);
+                    break;
+
+                case ExtensibilityGlobalsGlobalSection.GlobalSectionName:
+                    globalSection = SolutionFileTextSerializer.DeserializeExtensibilityGlobalsGlobalSection(reader, ref currentLine, preOrPostSolution);
                     break;
 
                 default:
@@ -263,7 +271,7 @@ namespace R5T.Solutas.Tiros
         {
             var projectConfigurationPlatformsGlobalSection = new ProjectConfigurationPlatformsGlobalSection
             {
-                Name = Constants.ProjectConfigurationPlatformsGlobalSectionName,
+                Name = ProjectConfigurationPlatformsGlobalSection.GlobalSectionName,
                 PreOrPostSolution = preOrPostSolution
             };
 
@@ -307,7 +315,7 @@ namespace R5T.Solutas.Tiros
         {
             var solutionConfigurationPlatformsGlobalSection = new SolutionConfigurationPlatformsGlobalSection
             {
-                Name = Constants.SolutionConfigurationPlatformsGlobalSectionName,
+                Name = SolutionConfigurationPlatformsGlobalSection.GlobalSectionName,
                 PreOrPostSolution = preOrPostSolution
             };
 
@@ -355,11 +363,11 @@ namespace R5T.Solutas.Tiros
             return solutionBuildConfiguration;
         }
 
-        private static NestedProjectsSolutionFileGlobalSection DeserializeNestedProjectsGlobalSection(TextReader reader, ref string currentLine, PreOrPostSolution preOrPostSolution)
+        private static NestedProjectsGlobalSection DeserializeNestedProjectsGlobalSection(TextReader reader, ref string currentLine, PreOrPostSolution preOrPostSolution)
         {
-            var nestedProjectGlobalSection = new NestedProjectsSolutionFileGlobalSection
+            var nestedProjectGlobalSection = new NestedProjectsGlobalSection
             {
-                Name = Constants.NestedProjectsGlobalSectionName,
+                Name = NestedProjectsGlobalSection.GlobalSectionName,
                 PreOrPostSolution = preOrPostSolution
             };
 
@@ -374,6 +382,60 @@ namespace R5T.Solutas.Tiros
             }
 
             return nestedProjectGlobalSection;
+        }
+
+        private static SolutionPropertiesGlobalSection DeserializeSolutionPropertiesGlobalSection(TextReader reader, ref string currentLine, PreOrPostSolution preOrPostSolution)
+        {
+            var solutionPropertiesGlobalSection = new SolutionPropertiesGlobalSection()
+            {
+                Name = SolutionPropertiesGlobalSection.GlobalSectionName,
+                PreOrPostSolution = preOrPostSolution,
+            };
+
+            currentLine = reader.ReadLine().Trim();
+
+            var tokens = currentLine.Split(' ');
+
+            var hideSolutionNodeValueToken = tokens[2];
+
+            var hideSolutionNodeValue = Boolean.Parse(hideSolutionNodeValueToken);
+
+            solutionPropertiesGlobalSection.HideSolutionNode = hideSolutionNodeValue;
+
+            currentLine = reader.ReadLine().Trim();
+            if(!SolutionFileTextSerializer.GlobalSectionEndRegex.IsMatch(currentLine))
+            {
+                throw new Exception($"Unknown data in {SolutionPropertiesGlobalSection.GlobalSectionName} global section:\n{currentLine}");
+            }
+
+            return solutionPropertiesGlobalSection;
+        }
+
+        private static ExtensibilityGlobalsGlobalSection DeserializeExtensibilityGlobalsGlobalSection(TextReader reader, ref string currentLine, PreOrPostSolution preOrPostSolution)
+        {
+            var extensibilityGlobalsGlobalSection = new ExtensibilityGlobalsGlobalSection()
+            {
+                Name = ExtensibilityGlobalsGlobalSection.GlobalSectionName,
+                PreOrPostSolution = preOrPostSolution,
+            };
+
+            currentLine = reader.ReadLine().Trim();
+
+            var tokens = currentLine.Split(' ');
+
+            var solutionGuidValueToken = tokens[2];
+
+            var solutionGuidValue = Guid.Parse(solutionGuidValueToken);
+
+            extensibilityGlobalsGlobalSection.SolutionGuid = solutionGuidValue;
+
+            currentLine = reader.ReadLine().Trim();
+            if (!SolutionFileTextSerializer.GlobalSectionEndRegex.IsMatch(currentLine))
+            {
+                throw new Exception($"Unknown data in {ExtensibilityGlobalsGlobalSection.GlobalSectionName} global section:\n{currentLine}");
+            }
+
+            return extensibilityGlobalsGlobalSection;
         }
 
         private static GenericSolutionFileGlobalSection DeserializeGeneralGlobal(TextReader reader, ref string currentLine, string sectionName, PreOrPostSolution preOrPostSolution)
@@ -457,7 +519,7 @@ namespace R5T.Solutas.Tiros
 
             var projectNesting = new ProjectNesting
             {
-                ProjectGUID = projectGUID,
+                ChildProjectGUID = projectGUID,
                 ParentProjectGUID = projectParentGuid
             };
             return projectNesting;
@@ -465,7 +527,7 @@ namespace R5T.Solutas.Tiros
 
         public static string SerializeProjectNesting(ProjectNesting projectNesting)
         {
-            var line = $"{projectNesting.ProjectGUID.ToString("B").ToUpperInvariant()} = {projectNesting.ParentProjectGUID.ToString("B").ToUpperInvariant()}";
+            var line = $"{projectNesting.ChildProjectGUID.ToString("B").ToUpperInvariant()} = {projectNesting.ParentProjectGUID.ToString("B").ToUpperInvariant()}";
             return line;
         }
 
