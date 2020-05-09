@@ -16,12 +16,12 @@ namespace R5T.Solutas.Tiros
 {
     public static class SolutionFileTextSerializer
     {
-        public const string ProjectLineRegexPattern = @"^Project";
-        public const string ProjectLineEndRegexPattern = @"^EndProject";
-        public const string GlobalLineRegexPattern = @"^Global";
-        public const string GlobalEndLineRegexPattern = @"^EndGlobal($|\s)";
-        public const string GlobalSectionRegexPattern = @"^GlobalSection";
-        public const string GlobalSectionEndRegexPattern = @"^EndGlobalSection";
+        public static readonly string ProjectLineRegexPattern = $@"^{Constants.Project}";
+        public static readonly string ProjectLineEndRegexPattern = $@"^{Constants.EndProject}";
+        public static readonly string GlobalLineRegexPattern = $@"^{Constants.Global}";
+        public static readonly string GlobalEndLineRegexPattern = $@"^{Constants.EndGlobal}($|\s)";
+        public static readonly string GlobalSectionRegexPattern = $@"^{Constants.GlobalSection}";
+        public static readonly string GlobalSectionEndRegexPattern = $@"^{Constants.EndGlobalSection}";
 
         public const string ProjectLineValuesRegexPattern = @"""([^""]*)"""; // Find matches in quotes, but includes the quotes.
         public const string GlobalSectionLineValuesRegexPattern = @"\(.*\)|(?<== ).*";
@@ -83,7 +83,7 @@ namespace R5T.Solutas.Tiros
             // All others that remain.
             globalSectionsInOrder.AddRange(globalSections);
 
-            writer.WriteLine("Global");
+            writer.WriteLine(Constants.Global);
 
             writer.IncreaseTabination();
 
@@ -94,12 +94,12 @@ namespace R5T.Solutas.Tiros
 
             writer.DecreaseTabination();
 
-            writer.WriteLine("EndGlobal");
+            writer.WriteLine(Constants.EndGlobal);
         }
 
         private static void SerializeGlobal(TabinatedWriter writer, ISolutionFileGlobalSection globalSection)
         {
-            var globalSectionLine = $"GlobalSection({globalSection.Name}) = {SolutionUtilities.ToStringStandard(globalSection.PreOrPostSolution)}";
+            var globalSectionLine = $"{Constants.GlobalSection}({globalSection.Name}) = {SolutionUtilities.ToStringStandard(globalSection.PreOrPostSolution)}";
             writer.WriteLine(globalSectionLine);
 
             writer.IncreaseTabination();
@@ -112,7 +112,7 @@ namespace R5T.Solutas.Tiros
 
             writer.DecreaseTabination();
 
-            writer.WriteLine("EndGlobalSection");
+            writer.WriteLine(Constants.EndGlobalSection);
         }
 
         private static IEnumerable<string> SerializeGlobal(ISolutionFileGlobalSection globalSection)
@@ -153,13 +153,13 @@ namespace R5T.Solutas.Tiros
 
         private static IEnumerable<string> SerializeSolutionPropertiesGlobalSection(SolutionPropertiesGlobalSection solutionPropertiesGlobalSection)
         {
-            var hideSolutionNode = $"HideSolutionNode = {solutionPropertiesGlobalSection.HideSolutionNode.ToStringSolutionFileFormat()}";
+            var hideSolutionNode = $"{Constants.HideSolutionNode} = {solutionPropertiesGlobalSection.HideSolutionNode.ToStringSolutionFileFormat()}";
             yield return hideSolutionNode;
         }
 
         private static IEnumerable<string> SerializeExtensibilityGlobalsGlobalSection(ExtensibilityGlobalsGlobalSection extensibilityGlobalsGlobalSection)
         {
-            var solutionGuid = $"SolutionGuid = {extensibilityGlobalsGlobalSection.SolutionGuid.ToStringSolutionFileFormat()}";
+            var solutionGuid = $"{Constants.SolutionGuid} = {extensibilityGlobalsGlobalSection.SolutionGuid.ToStringSolutionFileFormat()}";
             yield return solutionGuid;
         }
 
@@ -199,10 +199,10 @@ namespace R5T.Solutas.Tiros
         {
             foreach (var solutionProjectFileReference in solutionFile.SolutionFileProjectReferences)
             {
-                var projectLine = $@"Project(""{solutionProjectFileReference.ProjectTypeGUID.ToStringSolutionFileFormat()}"") = ""{solutionProjectFileReference.ProjectName}"", ""{solutionProjectFileReference.ProjectFileRelativePathValue}"", ""{solutionProjectFileReference.ProjectGUID.ToString("B").ToUpperInvariant()}""";
+                var projectLine = $@"{Constants.Project}(""{solutionProjectFileReference.ProjectTypeGUID.ToStringSolutionFileFormat()}"") = ""{solutionProjectFileReference.ProjectName}"", ""{solutionProjectFileReference.ProjectFileRelativePathValue}"", ""{solutionProjectFileReference.ProjectGUID.ToStringSolutionFileFormat()}""";
                 writer.WriteLine(projectLine);
 
-                writer.WriteLine("EndProject");
+                writer.WriteLine(Constants.EndProject);
             }
         }
 
@@ -527,7 +527,7 @@ namespace R5T.Solutas.Tiros
 
         public static string SerializeProjectNesting(ProjectNesting projectNesting)
         {
-            var line = $"{projectNesting.ChildProjectGUID.ToString("B").ToUpperInvariant()} = {projectNesting.ParentProjectGUID.ToString("B").ToUpperInvariant()}";
+            var line = $"{projectNesting.ChildProjectGUID.ToStringSolutionFileFormat()} = {projectNesting.ParentProjectGUID.ToStringSolutionFileFormat()}";
             return line;
         }
 
@@ -583,12 +583,12 @@ namespace R5T.Solutas.Tiros
         {
             writer.WriteLine(); // Blank first line.
 
-            var formatVersionLine = $"Microsoft Visual Studio Solution File, Format Version {solutionFile.FormatVersion.Major}.{solutionFile.FormatVersion.Minor:00}";
+            var formatVersionLine = $"{Constants.MicrosoftVisualStudioSolutionFile}, {Constants.FormatVersion} {solutionFile.FormatVersion.Major}.{solutionFile.FormatVersion.Minor:00}";
             writer.WriteLine(formatVersionLine);
             writer.WriteLine(solutionFile.VisualStudioMoniker);
-            var vsVersionLine = $"VisualStudioVersion = {solutionFile.VisualStudioVersion}";
+            var vsVersionLine = $"{Constants.VisualStudioVersion} = {solutionFile.VisualStudioVersion}";
             writer.WriteLine(vsVersionLine);
-            var vsMinimumVersionLine = $"MinimumVisualStudioVersion = {solutionFile.MinimumVisualStudioVersion}";
+            var vsMinimumVersionLine = $"{Constants.MinimumVisualStudioVersion} = {solutionFile.MinimumVisualStudioVersion}";
             writer.WriteLine(vsMinimumVersionLine);
 
             SolutionFileTextSerializer.SerializeProjectReferences(writer, solutionFile);

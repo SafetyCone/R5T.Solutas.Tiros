@@ -7,6 +7,21 @@ namespace R5T.Solutas.Tiros
 {
     class Constants
     {
+        // Solution file content constants.
+        public const string FormatVersion = "Format Version";
+        public const string HideSolutionNode = "HideSolutionNode";
+        public const string MicrosoftVisualStudioSolutionFile = "Microsoft Visual Studio Solution File";
+        public const string MinimumVisualStudioVersion = "MinimumVisualStudioVersion";
+        public const string SolutionGuid = "SolutionGuid";
+        public const string VisualStudioVersion = "VisualStudioVersion";
+
+        public const string Global = "Global";
+        public const string EndGlobal = "EndGlobal";
+        public const string GlobalSection = "GlobalSection";
+        public const string EndGlobalSection = "EndGlobalSection";
+        public const string Project = "Project";
+        public const string EndProject = "EndProject";
+
         public const string DependenciesSolutionFolderName = "_Dependencies";
         public const string DebugSolutionFileBuildConfigurationToken = BuildConfigurationName.Debug;
         public const string ReleaseSolutionFileBuildConfigurationToken = BuildConfigurationName.Release;
