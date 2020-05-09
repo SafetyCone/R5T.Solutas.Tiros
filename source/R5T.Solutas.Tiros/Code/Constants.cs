@@ -1,13 +1,15 @@
 ﻿using System;
 
+using R5T.Angleterria;
+
 
 namespace R5T.Solutas.Tiros
 {
     class Constants
     {
         public const string DependenciesSolutionFolderName = "_Dependencies";
-        public const string DebugSolutionFileBuildConfigurationToken = "Debug";
-        public const string ReleaseSolutionFileBuildConfigurationToken = "Release";
+        public const string DebugSolutionFileBuildConfigurationToken = BuildConfigurationName.Debug;
+        public const string ReleaseSolutionFileBuildConfigurationToken = BuildConfigurationName.Release;
         public const string AnyCpuSolutionFileReleasePlatformToken = "Any CPU";
         public const string x86SolutionFileReleasePlatformToken = "x86";
         public const string x64SolutionFileReleasePlatformToken = "x64";
