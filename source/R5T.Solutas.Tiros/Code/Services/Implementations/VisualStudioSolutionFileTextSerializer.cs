@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.IO;
 
 using R5T.Cambridge.Types;
-using R5T.Tiros;
+using R5T.Tiros;using R5T.T0064;
 
 
 namespace R5T.Solutas.Tiros
-{
-    public class VisualStudioSolutionFileTextSerializer : ITextSerializer<SolutionFile>
+{[ServiceImplementationMarker]
+    public class VisualStudioSolutionFileTextSerializer : ITextSerializer<SolutionFile>,IServiceImplementation
     {
         public SolutionFile Deserialize(TextReader reader)
         {
