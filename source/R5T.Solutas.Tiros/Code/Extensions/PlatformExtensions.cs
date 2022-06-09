@@ -22,7 +22,7 @@ namespace R5T.Solutas.Tiros
                     return Constants.x64SolutionFileReleasePlatformToken;
 
                 default:
-                    throw new Exception(EnumHelper.UnexpectedEnumerationValueMessage(platformTarget));
+                    throw new Exception(EnumerationHelper.UnexpectedEnumerationValueMessage(platformTarget));
             }
         }
     }

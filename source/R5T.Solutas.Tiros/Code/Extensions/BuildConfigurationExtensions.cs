@@ -19,7 +19,7 @@ namespace R5T.Solutas.Tiros
                     return Constants.ReleaseSolutionFileBuildConfigurationToken;
 
                 default:
-                    throw new Exception(EnumHelper.UnexpectedEnumerationValueMessage(buildConfiguration));
+                    throw new Exception(EnumerationHelper.UnexpectedEnumerationValueMessage(buildConfiguration));
             }
         }
     }

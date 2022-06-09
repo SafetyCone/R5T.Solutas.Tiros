@@ -19,7 +19,7 @@ namespace R5T.Solutas.Tiros
                     return PreOrPostSolution.PostSolution;
 
                 default:
-                    throw new Exception(EnumHelper.UnrecognizedEnumerationValueMessage<PreOrPostSolution>(value));
+                    throw new Exception(EnumerationHelper.UnrecognizedEnumerationValueMessage<PreOrPostSolution>(value));
             }
         }
 
@@ -34,7 +34,7 @@ namespace R5T.Solutas.Tiros
                     return "postSolution";
 
                 default:
-                    throw new Exception(EnumHelper.UnexpectedEnumerationValueMessage(preOrPostSolution));
+                    throw new Exception(EnumerationHelper.UnexpectedEnumerationValueMessage(preOrPostSolution));
             }
         }
 
@@ -49,7 +49,7 @@ namespace R5T.Solutas.Tiros
                     return BuildConfiguration.Release;
 
                 default:
-                    throw new Exception(EnumHelper.UnrecognizedEnumerationValueMessage<BuildConfiguration>(value));
+                    throw new Exception(EnumerationHelper.UnrecognizedEnumerationValueMessage<BuildConfiguration>(value));
             }
         }
 
@@ -67,7 +67,7 @@ namespace R5T.Solutas.Tiros
                     return Platform.x64;
 
                 default:
-                    throw new Exception(EnumHelper.UnrecognizedEnumerationValueMessage<Platform>(value));
+                    throw new Exception(EnumerationHelper.UnrecognizedEnumerationValueMessage<Platform>(value));
             }
         }
 
@@ -82,7 +82,7 @@ namespace R5T.Solutas.Tiros
                     return ProjectConfigurationIndicator.Build0;
 
                 default:
-                    throw new Exception(EnumHelper.UnrecognizedEnumerationValueMessage<ProjectConfigurationIndicator>(value));
+                    throw new Exception(EnumerationHelper.UnrecognizedEnumerationValueMessage<ProjectConfigurationIndicator>(value));
             }
         }
     }
